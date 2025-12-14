@@ -1,0 +1,732 @@
+{
+	"info": {
+		"name": "MyJoints API - PHP Backend",
+		"description": "Complete API collection for MyJoints PHP/MySQL backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Sign In",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"patient@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"patient\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/signin",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "signin"]
+						}
+					}
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"patient@example.com\",\n  \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/verify-otp",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "verify-otp"]
+						}
+					}
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"patient@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/forgot-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "forgot-password"]
+						}
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"patient@example.com\",\n  \"otp\": \"123456\",\n  \"password\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/reset-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "reset-password"]
+						}
+					}
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"patient@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"patient\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/delete-account",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "delete-account"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Patient",
+			"item": [
+				{
+					"name": "Patient Signup",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"patient@example.com\",\n  \"phone\": \"1234567890\",\n  \"age\": 35,\n  \"weight\": 70.5,\n  \"sex\": \"male\",\n  \"occupation\": \"Engineer\",\n  \"address\": \"123 Main St\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Get Patient Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Upload File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{"key": "file", "type": "file", "src": ""},
+								{"key": "patient_id", "value": "1", "type": "text"}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/upload",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "upload"]
+						}
+					}
+				},
+				{
+					"name": "Get Patient Files",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/files?patient_id=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "files"],
+							"query": [{"key": "patient_id", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Download File",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/download?filename=example.pdf",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "download"],
+							"query": [{"key": "filename", "value": "example.pdf"}]
+						}
+					}
+				},
+				{
+					"name": "Get Assigned Doctors",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/doctors?patient_id=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "doctors"],
+							"query": [{"key": "patient_id", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Add Investigation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uid\": 1,\n  \"hb\": 13.5,\n  \"esr\": 20,\n  \"crp\": 5.2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/investigation",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "investigation"]
+						}
+					}
+				},
+				{
+					"name": "Get Investigations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/investigation?uid=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "investigation"],
+							"query": [{"key": "uid", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Delete Investigation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/investigation",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "investigation"]
+						}
+					}
+				},
+				{
+					"name": "Add Disease Score",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uid\": 1,\n  \"sdai\": 15.5,\n  \"das_28_crp\": 3.2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/disease_score",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "disease_score"]
+						}
+					}
+				},
+				{
+					"name": "Get Disease Scores",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/disease_score?uid=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "disease_score"],
+							"query": [{"key": "uid", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Delete Disease Score",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/disease_score",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "disease_score"]
+						}
+					}
+				},
+				{
+					"name": "Add Referral",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uid\": 1,\n  \"text\": \"Refer to orthopedic specialist\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/referrals",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "referrals"]
+						}
+					}
+				},
+				{
+					"name": "Get Referrals",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/referrals?uid=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "referrals"],
+							"query": [{"key": "uid", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Delete Referral",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/referrals",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "referrals"]
+						}
+					}
+				},
+				{
+					"name": "Add Treatment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uid\": 1,\n  \"treatment\": \"Medication\",\n  \"name\": \"Methotrexate\",\n  \"dose\": \"15mg\",\n  \"route\": \"Oral\",\n  \"frequency\": \"Weekly\",\n  \"frequency_text\": \"Once a week\",\n  \"Time_Period\": \"6 months\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/treatments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "treatments"]
+						}
+					}
+				},
+				{
+					"name": "Get Treatments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/treatments?uid=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "treatments"],
+							"query": [{"key": "uid", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Delete Treatment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/treatments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "treatments"]
+						}
+					}
+				},
+				{
+					"name": "Add Comorbidity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uid\": 1,\n  \"text\": \"Hypertension\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/comorbidities",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "comorbidities"]
+						}
+					}
+				},
+				{
+					"name": "Get Comorbidities",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/comorbidities?uid=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "comorbidities"],
+							"query": [{"key": "uid", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Delete Comorbidity",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/comorbidities",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "comorbidities"]
+						}
+					}
+				},
+				{
+					"name": "Add Medication",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uid\": 1,\n  \"medications\": \"Aspirin 100mg daily\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/medications",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "medications"]
+						}
+					}
+				},
+				{
+					"name": "Get Medications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/medications?uid=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "medications"],
+							"query": [{"key": "uid", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Delete Medication",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/medications",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "medications"]
+						}
+					}
+				},
+				{
+					"name": "Record Pain Assessment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": 1,\n  \"pain_score\": 7\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/pain-assessment",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "pain-assessment"]
+						}
+					}
+				},
+				{
+					"name": "Get Pain Assessments",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/pain-assessment?patient_id=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "pain-assessment"],
+							"query": [{"key": "patient_id", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Add Complaint",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uid\": 1,\n  \"did\": 1,\n  \"text\": \"Severe joint pain in knees\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/complaints",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "complaints"]
+						}
+					}
+				},
+				{
+					"name": "Get Complaints",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/complaints?uid=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "complaints"],
+							"query": [{"key": "uid", "value": "1"}]
+						}
+					}
+				},
+				{
+					"name": "Delete Complaint",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/patient/complaints",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "patient", "complaints"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Doctor",
+			"item": [
+				{
+					"name": "Doctor Signup",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Dr. Smith\",\n  \"email\": \"doctor@example.com\",\n  \"phone\": \"9876543210\",\n  \"specialization\": \"Rheumatology\",\n  \"address\": \"456 Medical Center\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/doctor/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "doctor", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Get Doctor Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/doctor/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "doctor", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Get Doctor Patients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/doctor/patient",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "doctor", "patient"]
+						}
+					}
+				},
+				{
+					"name": "Link Patient to Doctor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_email\": \"patient@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/doctor/patient",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "doctor", "patient"]
+						}
+					}
+				},
+				{
+					"name": "Get Patients (Alias)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/doctor/patients",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "doctor", "patients"]
+						}
+					}
+				},
+				{
+					"name": "Send Consult Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": 1,\n  \"doctor_id\": 1,\n  \"message\": \"Request for consultation\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/doctor/consult-request",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "doctor", "consult-request"]
+						}
+					}
+				},
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/doctor/notifications",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "doctor", "notifications"]
+						}
+					}
+				},
+				{
+					"name": "Update Notification Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"status\": \"accepted\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/doctor/notifications/update",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "doctor", "notifications", "update"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:80",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
