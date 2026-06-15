@@ -18,16 +18,16 @@ $doctorId = $user['id'];
 $db = getDB();
 
 try {
-    $stmt = $db->prepare("SELECT id, name, email, phone, address, specialization FROM doctors WHERE id = ?");
+    $stmt = $db->prepare("SELECT did as id, name, email, phone, address, specialization FROM doctors WHERE did = ?");
     $stmt->execute([$doctorId]);
     $doctor = $stmt->fetch();
-    
+
     if (!$doctor) {
         jsonResponse(['error' => 'Doctor not found'], 404);
     }
-    
+
     jsonResponse(['doctor' => $doctor], 200);
-    
+
 } catch (Exception $e) {
     jsonResponse(['error' => $e->getMessage()], 500);
 }

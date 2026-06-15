@@ -20,9 +20,9 @@ try {
     $stmt = $db->prepare("SELECT * FROM doctor_notifications WHERE doctor_id = ? AND status = 'pending' ORDER BY created_at DESC");
     $stmt->execute([$doctorId]);
     $notifications = $stmt->fetchAll();
-    
+
     jsonResponse(['notifications' => $notifications], 200);
-    
+
 } catch (Exception $e) {
-    jsonResponse(['error' => 'Failed to fetch notifications'], 500);
+    jsonResponse(['error' => 'Failed to fetch notifications: ' . $e->getMessage()], 500);
 }

@@ -13,15 +13,15 @@ $method = getRequestMethod();
 if ($method === 'GET') {
     $user = JWT::requireDoctorAuth();
     $doctorId = $user['id'];
-    
+
     $db = getDB();
     try {
         $stmt = $db->prepare("
-            SELECT p.id, p.name, p.email, p.phone, p.age, p.sex, p.weight, p.occupation, p.address
+            SELECT p.uid as id, p.name, p.email, p.phone, p.age, p.sex, p.weight, p.occupation, p.address
             FROM patients p
-            INNER JOIN patient_doctor pd ON p.id = pd.patient_id
-            WHERE pd.doctor_id = ?
-            ORDER BY p.id DESC
+            INNER JOIN patient_doctor pd ON p.uid = pd.uid
+            WHERE pd.did = ?
+            ORDER BY p.uid DESC
         ");
         $stmt->execute([$doctorId]);
         $patients = $stmt->fetchAll();
@@ -29,51 +29,51 @@ if ($method === 'GET') {
     } catch (Exception $e) {
         jsonResponse(['error' => $e->getMessage()], 500);
     }
-    
+
 } elseif ($method === 'POST') {
     $user = JWT::requireDoctorAuth();
     $doctorId = $user['id'];
     $data = getRequestData();
-    
+
     $patientEmail = $data['patient_email'] ?? null;
-    
+
     if (!$patientEmail) {
         jsonResponse(['error' => 'Missing patient_email'], 400);
     }
-    
+
     $db = getDB();
     try {
         // Find patient by email
         $stmt = $db->prepare("SELECT * FROM patients WHERE email = ?");
         $stmt->execute([$patientEmail]);
         $patient = $stmt->fetch();
-        
+
         if (!$patient) {
             jsonResponse(['error' => 'Patient not found'], 404);
         }
-        
-        $patientId = $patient['id'];
-        
+
+        $patientId = $patient['uid'];
+
         // Check if already linked
-        $stmt = $db->prepare("SELECT * FROM patient_doctor WHERE doctor_id = ? AND patient_id = ?");
+        $stmt = $db->prepare("SELECT * FROM patient_doctor WHERE did = ? AND uid = ?");
         $stmt->execute([$doctorId, $patientId]);
         if ($stmt->fetch()) {
             jsonResponse(['message' => 'Doctor and patient are already linked', 'warning' => 'This doctor-patient relationship already exists'], 200);
         }
-        
+
         // Create link
-        $stmt = $db->prepare("INSERT INTO patient_doctor (doctor_id, patient_id) VALUES (?, ?)");
+        $stmt = $db->prepare("INSERT INTO patient_doctor (did, uid) VALUES (?, ?)");
         $stmt->execute([$doctorId, $patientId]);
-        
+
         jsonResponse(['message' => 'Linked doctor and patient'], 201);
-        
+
     } catch (Exception $e) {
         if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
             jsonResponse(['message' => 'Doctor and patient are already linked', 'warning' => 'This doctor-patient relationship already exists'], 200);
         }
         jsonResponse(['error' => $e->getMessage()], 500);
     }
-    
+
 } else {
     jsonResponse(['error' => 'Method not allowed'], 405);
 }

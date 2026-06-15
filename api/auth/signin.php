@@ -32,33 +32,35 @@ try {
     $stmt = $db->prepare("SELECT * FROM $table WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
-    
+
     if (!$user) {
         jsonResponse(['error' => 'Invalid credentials'], 401);
     }
-    
+
     if (!password_verify($password, $user['password'])) {
         jsonResponse(['error' => 'Invalid credentials'], 401);
     }
-    
+
+    $userId = $role === 'doctor' ? $user['did'] : $user['uid'];
+
     $payload = [
-        'id' => $user['id'],
+        'id' => $userId,
         'email' => $user['email'],
         'role' => $role
     ];
-    
+
     $token = JWT::encode($payload);
-    
+
     jsonResponse([
         'token' => $token,
         'user' => [
-            'id' => $user['id'],
+            'id' => $userId,
             'email' => $user['email'],
             'name' => $user['name'],
             'role' => $role
         ]
     ], 200);
-    
+
 } catch (Exception $e) {
     jsonResponse(['error' => $e->getMessage()], 500);
 }

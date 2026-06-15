@@ -14,7 +14,7 @@ if ($method === 'POST') {
     $user = JWT::requireDoctorAuth();
     $data = getRequestData();
     
-    $patientId = $data['uid'] ?? null;
+    $patientId = getPatientIdFromRequest();
     $text = $data['text'] ?? null;
     
     if (!$patientId || !$text) {
@@ -25,7 +25,7 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("INSERT INTO referrals (patient_id, text) VALUES (?, ?)");
+        $stmt = $db->prepare("INSERT INTO Referrals (uid, text) VALUES (?, ?)");
         $stmt->execute([$patientId, $text]);
         jsonResponse(['message' => 'Referral added'], 201);
     } catch (Exception $e) {
@@ -34,7 +34,7 @@ if ($method === 'POST') {
     
 } elseif ($method === 'GET') {
     $user = JWT::requireAuth();
-    $patientId = $_GET['uid'] ?? $user['id'];
+    $patientId = getPatientIdFromRequest() ?? $user['id'];
     
     if ($user['role'] === 'doctor') {
         requireDoctorAssignedToPatient($patientId);
@@ -44,7 +44,7 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("SELECT * FROM referrals WHERE patient_id = ? ORDER BY created_at DESC LIMIT 20");
+        $stmt = $db->prepare("SELECT * FROM Referrals WHERE uid = ? ORDER BY id DESC LIMIT 20");
         $stmt->execute([$patientId]);
         $results = $stmt->fetchAll();
         jsonResponse($results, 200);
@@ -63,7 +63,7 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("DELETE FROM referrals WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM Referrals WHERE id = ?");
         $stmt->execute([$id]);
         jsonResponse(['message' => 'Referral deleted'], 200);
     } catch (Exception $e) {

@@ -13,11 +13,11 @@ $method = getRequestMethod();
 if ($method === 'POST') {
     $user = JWT::requireAuth();
     $data = getRequestData();
-    
+
     $text = $data['text'] ?? null;
-    $patientId = $data['uid'] ?? null;
+    $patientId = getPatientIdFromRequest();
     $doctorId = $data['did'] ?? null;
-    
+
     if ($user['role'] === 'doctor') {
         $doctorId = $user['id'];
         if (!$patientId) {
@@ -32,70 +32,71 @@ if ($method === 'POST') {
     } else {
         jsonResponse(['error' => 'Forbidden'], 403);
     }
-    
+
     $db = getDB();
     try {
-        $stmt = $db->prepare("INSERT INTO complaints (patient_id, doctor_id, complaint) VALUES (?, ?, ?)");
+        // no-op; tool requires valid content
+        $stmt = $db->prepare("INSERT INTO complaints (uid, did, complaint) VALUES (?, ?, ?)");
         $stmt->execute([$patientId, $doctorId, $text]);
         jsonResponse(['message' => 'Complaint added'], 201);
     } catch (Exception $e) {
         jsonResponse(['error' => $e->getMessage()], 500);
     }
-    
+
 } elseif ($method === 'GET') {
     $user = JWT::requireAuth();
-    $patientId = $_GET['uid'] ?? $user['id'];
-    
+    $patientId = getPatientIdFromRequest() ?? $user['id'];
+
     if ($user['role'] === 'doctor') {
         requireDoctorAssignedToPatient($patientId);
     } elseif ($user['role'] === 'patient') {
         $patientId = $user['id'];
     }
-    
+
     $db = getDB();
     try {
-        $stmt = $db->prepare("SELECT * FROM complaints WHERE patient_id = ? ORDER BY created_at DESC LIMIT 20");
+        $stmt = $db->prepare("SELECT * FROM complaints WHERE uid = ? ORDER BY createdAt DESC LIMIT 20");
         $stmt->execute([$patientId]);
         $results = $stmt->fetchAll();
         jsonResponse($results, 200);
     } catch (Exception $e) {
         jsonResponse(['error' => $e->getMessage()], 500);
     }
-    
+
 } elseif ($method === 'DELETE') {
     $user = JWT::requireAuth();
     $data = getRequestData();
     $id = $data['id'] ?? null;
-    
+
     if (!$id) {
         jsonResponse(['error' => 'Missing id'], 400);
     }
-    
+
     $db = getDB();
     try {
         // Check ownership
         $stmt = $db->prepare("SELECT * FROM complaints WHERE id = ?");
         $stmt->execute([$id]);
         $complaint = $stmt->fetch();
-        
+
         if (!$complaint) {
             jsonResponse(['error' => 'Not found'], 404);
         }
-        
-        $isOwner = ($user['role'] === 'doctor' && $complaint['doctor_id'] == $user['id']) ||
-                   ($user['role'] === 'patient' && $complaint['patient_id'] == $user['id']);
-        
+
+        $isOwner = ($user['role'] === 'doctor' && $complaint['did'] == $user['id']) ||
+            ($user['role'] === 'patient' && $complaint['uid'] == $user['id']);
+
         if (!$isOwner) {
             jsonResponse(['error' => 'Forbidden'], 403);
         }
-        
+
         $stmt = $db->prepare("DELETE FROM complaints WHERE id = ?");
         $stmt->execute([$id]);
         jsonResponse(['message' => 'Complaint deleted'], 200);
     } catch (Exception $e) {
         jsonResponse(['error' => $e->getMessage()], 500);
     }
-    
+
 } else {
     jsonResponse(['error' => 'Method not allowed'], 405);
 }

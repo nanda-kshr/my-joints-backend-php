@@ -13,8 +13,10 @@ $method = getRequestMethod();
 if ($method === 'POST') {
     $user = JWT::requireDoctorAuth();
     $data = getRequestData();
+    // normalize incoming keys to lowercase so clients can send varied casing (e.g. "Hb" or "hb")
+    $normalized = array_change_key_case($data, CASE_LOWER);
     
-    $patientId = $data['uid'] ?? null;
+    $patientId = getPatientIdFromRequest();
     if (!$patientId) {
         jsonResponse(['error' => 'Patient uid is required'], 400);
     }
@@ -30,22 +32,29 @@ if ($method === 'POST') {
     
     $values = [];
     $placeholders = [];
-    $columns = ['patient_id'];
+    $columns = ['uid'];
     $values[] = $patientId;
     
     foreach ($fields as $field) {
-        if (isset($data[$field])) {
+        if (isset($normalized[$field])) {
             $columns[] = $field;
-            $values[] = $data[$field];
+            $values[] = $normalized[$field];
             $placeholders[] = '?';
         }
     }
     
     $db = getDB();
     try {
-        $sql = "INSERT INTO investigations (patient_id, " . implode(', ', array_slice($columns, 1)) . ") VALUES (?, " . implode(', ', $placeholders) . ")";
-        $stmt = $db->prepare($sql);
-        $stmt->execute($values);
+        if (empty($placeholders)) {
+            // Only uid provided
+            $sql = "INSERT INTO Investigation (uid) VALUES (?)";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$patientId]);
+        } else {
+            $sql = "INSERT INTO Investigation (uid, " . implode(', ', array_slice($columns, 1)) . ") VALUES (?, " . implode(', ', $placeholders) . ")";
+            $stmt = $db->prepare($sql);
+            $stmt->execute($values);
+        }
         jsonResponse(['message' => 'Investigation added'], 201);
     } catch (Exception $e) {
         jsonResponse(['error' => $e->getMessage()], 500);
@@ -53,7 +62,7 @@ if ($method === 'POST') {
     
 } elseif ($method === 'GET') {
     $user = JWT::requireAuth();
-    $patientId = $_GET['uid'] ?? $user['id'];
+    $patientId = getPatientIdFromRequest() ?? $user['id'];
     
     if ($user['role'] === 'doctor') {
         requireDoctorAssignedToPatient($patientId);
@@ -63,7 +72,7 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("SELECT * FROM investigations WHERE patient_id = ? ORDER BY created_at DESC LIMIT 20");
+        $stmt = $db->prepare("SELECT * FROM Investigation WHERE uid = ? ORDER BY createdAt DESC LIMIT 20");
         $stmt->execute([$patientId]);
         $results = $stmt->fetchAll();
         jsonResponse($results, 200);
@@ -82,7 +91,7 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("DELETE FROM investigations WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM Investigation WHERE id = ?");
         $stmt->execute([$id]);
         jsonResponse(['message' => 'Investigation deleted'], 200);
     } catch (Exception $e) {

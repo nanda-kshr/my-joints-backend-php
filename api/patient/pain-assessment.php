@@ -12,16 +12,16 @@ $method = getRequestMethod();
 if ($method === 'POST') {
     $data = getRequestData();
     
-    $patientId = $data['patient_id'] ?? null;
-    $painScore = $data['pain_score'] ?? null;
+    $patientId = getPatientIdFromRequest();
+    $painScore = $data['pain_score'] ?? $data['painScore'] ?? $data['painScore'] ?? null;
     
     if (!$patientId || !is_numeric($painScore)) {
-        jsonResponse(['error' => 'Missing or invalid patient_id or pain_score'], 400);
+        jsonResponse(['error' => 'Missing or invalid patient id or pain_score'], 400);
     }
-    
+
     $db = getDB();
     try {
-        $stmt = $db->prepare("INSERT INTO pain_assessments (patient_id, pain_score) VALUES (?, ?)");
+        $stmt = $db->prepare("INSERT INTO PainAssessment (patient_id, pain_score) VALUES (?, ?)");
         $stmt->execute([$patientId, $painScore]);
         jsonResponse(['message' => 'Pain score recorded'], 200);
     } catch (Exception $e) {
@@ -29,15 +29,15 @@ if ($method === 'POST') {
     }
     
 } elseif ($method === 'GET') {
-    $patientId = $_GET['patient_id'] ?? null;
+    $patientId = getPatientIdFromRequest();
     
     if (!$patientId) {
-        jsonResponse(['error' => 'Missing patient_id'], 400);
+        jsonResponse(['error' => 'Missing patient id'], 400);
     }
-    
+
     $db = getDB();
     try {
-        $stmt = $db->prepare("SELECT pain_score, recorded_at FROM pain_assessments WHERE patient_id = ? ORDER BY recorded_at DESC LIMIT 10");
+        $stmt = $db->prepare("SELECT pain_score, recorded_at FROM PainAssessment WHERE patient_id = ? ORDER BY recorded_at DESC LIMIT 10");
         $stmt->execute([$patientId]);
         $scores = $stmt->fetchAll();
         jsonResponse(['scores' => $scores], 200);

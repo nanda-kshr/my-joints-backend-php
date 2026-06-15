@@ -12,6 +12,8 @@ if (getRequestMethod() !== 'PUT') {
     jsonResponse(['error' => 'Method not allowed'], 405);
 }
 
+$user = JWT::requireDoctorAuth();
+
 $data = getRequestData();
 $id = $data['id'] ?? null;
 $status = $data['status'] ?? null;
@@ -26,21 +28,21 @@ try {
     // Update notification status
     $stmt = $db->prepare("UPDATE doctor_notifications SET status = ? WHERE id = ?");
     $stmt->execute([$status, $id]);
-    
+
     if ($stmt->rowCount() === 0) {
         jsonResponse(['error' => 'Notification not found or not updated'], 404);
     }
-    
+
     // Get notification details to send email
     $stmt = $db->prepare("SELECT * FROM doctor_notifications WHERE id = ?");
     $stmt->execute([$id]);
     $notification = $stmt->fetch();
-    
+
     if ($notification && isset($notification['patient_id'])) {
-        $stmt = $db->prepare("SELECT email FROM patients WHERE id = ?");
+        $stmt = $db->prepare("SELECT email FROM patients WHERE uid = ?");
         $stmt->execute([$notification['patient_id']]);
         $patient = $stmt->fetch();
-        
+
         if ($patient && isset($patient['email'])) {
             try {
                 sendMail(
@@ -53,9 +55,9 @@ try {
             }
         }
     }
-    
+
     jsonResponse(['message' => 'Notification status updated', 'id' => $id, 'status' => $status], 200);
-    
+
 } catch (Exception $e) {
     jsonResponse(['error' => 'Failed to update notification'], 500);
 }

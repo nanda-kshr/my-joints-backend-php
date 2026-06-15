@@ -14,7 +14,7 @@ if ($method === 'POST') {
     $user = JWT::requireDoctorAuth();
     $data = getRequestData();
     
-    $patientId = $data['uid'] ?? null;
+    $patientId = getPatientIdFromRequest();
     if (!$patientId) {
         jsonResponse(['error' => 'Patient uid is required'], 400);
     }
@@ -31,7 +31,7 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("INSERT INTO treatments (patient_id, treatment, name, dose, route, frequency, frequency_text, time_period) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $db->prepare("INSERT INTO treatments (uid, treatment, name, dose, route, frequency, frequency_text, time_period) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$patientId, $treatment, $name, $dose, $route, $frequency, $frequency_text, $time_period]);
         jsonResponse(['message' => 'Treatment added'], 201);
     } catch (Exception $e) {
@@ -40,7 +40,7 @@ if ($method === 'POST') {
     
 } elseif ($method === 'GET') {
     $user = JWT::requireAuth();
-    $patientId = $_GET['uid'] ?? $user['id'];
+    $patientId = getPatientIdFromRequest() ?? $user['id'];
     
     if ($user['role'] === 'doctor') {
         requireDoctorAssignedToPatient($patientId);
@@ -50,7 +50,7 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("SELECT * FROM treatments WHERE patient_id = ? ORDER BY created_at DESC LIMIT 20");
+        $stmt = $db->prepare("SELECT * FROM treatments WHERE uid = ? ORDER BY createdAt DESC LIMIT 20");
         $stmt->execute([$patientId]);
         $results = $stmt->fetchAll();
         jsonResponse($results, 200);

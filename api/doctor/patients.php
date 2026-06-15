@@ -18,17 +18,17 @@ $db = getDB();
 
 try {
     $stmt = $db->prepare("
-        SELECT p.id, p.name, p.email, p.phone, p.age, p.sex, p.weight, p.occupation, p.address
+        SELECT p.uid as id, p.name, p.email, p.phone, p.age, p.sex, p.weight, p.occupation, p.address
         FROM patients p
-        INNER JOIN patient_doctor pd ON p.id = pd.patient_id
-        WHERE pd.doctor_id = ?
-        ORDER BY p.id DESC
+        INNER JOIN patient_doctor pd ON p.uid = pd.uid
+        WHERE pd.did = ?
+        ORDER BY p.uid DESC
     ");
     $stmt->execute([$doctorId]);
     $patients = $stmt->fetchAll();
-    
+
     jsonResponse($patients, 200);
-    
+
 } catch (Exception $e) {
     jsonResponse(['error' => $e->getMessage()], 500);
 }

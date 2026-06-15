@@ -14,7 +14,7 @@ if ($method === 'POST') {
     $user = JWT::requireDoctorAuth();
     $data = getRequestData();
     
-    $patientId = $data['uid'] ?? null;
+    $patientId = getPatientIdFromRequest();
     $text = $data['text'] ?? null;
     
     if (!$patientId || !$text) {
@@ -25,7 +25,7 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("INSERT INTO comorbidities (patient_id, text) VALUES (?, ?)");
+        $stmt = $db->prepare("INSERT INTO comorbidities (uid, text) VALUES (?, ?)");
         $stmt->execute([$patientId, $text]);
         jsonResponse(['message' => 'Comorbidity added'], 201);
     } catch (Exception $e) {
@@ -34,7 +34,7 @@ if ($method === 'POST') {
     
 } elseif ($method === 'GET') {
     $user = JWT::requireAuth();
-    $patientId = $_GET['uid'] ?? $user['id'];
+    $patientId = getPatientIdFromRequest() ?? $user['id'];
     
     if ($user['role'] === 'doctor') {
         requireDoctorAssignedToPatient($patientId);
@@ -44,39 +44,10 @@ if ($method === 'POST') {
     
     $db = getDB();
     try {
-        $stmt = $db->prepare("SELECT * FROM comorbidities WHERE patient_id = ? ORDER BY created_at DESC LIMIT 20");
+        $stmt = $db->prepare("SELECT * FROM comorbidities WHERE uid = ? ORDER BY createdAt DESC LIMIT 20");
         $stmt->execute([$patientId]);
         $results = $stmt->fetchAll();
         jsonResponse($results, 200);
-    } catch (Exception $e) {
-        jsonResponse(['error' => $e->getMessage()], 500);
-    }
-    
-} elseif ($method === 'DELETE') {
-    $user = JWT::requireAuth();
-    $data = getRequestData();
-    $id = $data['id'] ?? null;
-    
-    if (!$id) {
-        jsonResponse(['error' => 'Missing id'], 400);
-    }
-    
-    if ($user['role'] === 'doctor') {
-        requireDoctorAssignedToPatient($user['id']);
-    }
-    
-    $db = getDB();
-    try {
-        // Verify ownership
-        $stmt = $db->prepare("SELECT * FROM comorbidities WHERE id = ? AND patient_id = ?");
-        $stmt->execute([$id, $user['id']]);
-        if (!$stmt->fetch()) {
-            jsonResponse(['error' => 'Comorbidity not found or access denied'], 404);
-        }
-        
-        $stmt = $db->prepare("DELETE FROM comorbidities WHERE id = ?");
-        $stmt->execute([$id]);
-        jsonResponse(['message' => 'Comorbidity deleted'], 200);
     } catch (Exception $e) {
         jsonResponse(['error' => $e->getMessage()], 500);
     }

@@ -11,6 +11,8 @@ if (getRequestMethod() !== 'POST') {
     jsonResponse(['error' => 'Method not allowed'], 405);
 }
 
+$user = JWT::requireDoctorAuth();
+
 $data = getRequestData();
 $patientId = $data['patient_id'] ?? null;
 $doctorId = $data['doctor_id'] ?? null;
@@ -25,9 +27,9 @@ $db = getDB();
 try {
     $stmt = $db->prepare("INSERT INTO doctor_notifications (doctor_id, patient_id, message, status) VALUES (?, ?, ?, 'pending')");
     $stmt->execute([$doctorId, $patientId, $message]);
-    
+
     jsonResponse(['message' => 'Consultation request sent.'], 200);
-    
+
 } catch (Exception $e) {
-    jsonResponse(['error' => 'Failed to send consultation request'], 500);
+    jsonResponse(['error' => 'Failed to send consultation request', 'details' => $e->getMessage()], 500);
 }
