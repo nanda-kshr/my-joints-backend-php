@@ -3,6 +3,7 @@
 // Body: { id, status }
 
 require_once __DIR__ . '/../../../lib/database.php';
+require_once __DIR__ . '/../../../lib/jwt.php';
 require_once __DIR__ . '/../../../lib/mail.php';
 require_once __DIR__ . '/../../../lib/utils.php';
 

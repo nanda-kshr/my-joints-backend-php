@@ -1,0 +1,36 @@
+{
+  "phase": "testing",
+  "server": {
+    "host": "localhost",
+    "port": 8000,
+    "started": true
+  },
+  "discovery": {
+    "completed": true,
+    "endpoint_count": 35
+  },
+  "auth": {
+    "patient_created": true,
+    "doctor_created": true,
+    "patient_token_captured": true,
+    "doctor_token_captured": true,
+    "patient_email": "dast_patient_1781507216@example.com",
+    "doctor_email": "dast_doctor_1781507216@example.com",
+    "patient_token_masked": "eyJ0eXAi...X6GIChFM",
+    "doctor_token_masked": "eyJ0eXAi...kuO-cFN0"
+  },
+  "auth_context": {
+    "patient_email": "dast_patient_1781507216@example.com",
+    "doctor_email": "dast_doctor_1781507216@example.com",
+    "patient_id": 10,
+    "doctor_id": 5,
+    "masked": {
+      "patient_token": "eyJ0eXAi...X6GIChFM",
+      "doctor_token": "eyJ0eXAi...kuO-cFN0"
+    },
+    "signup_statuses": {
+      "patient": 201,
+      "doctor": 201
+    }
+  }
+}

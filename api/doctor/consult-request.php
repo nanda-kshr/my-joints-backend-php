@@ -3,6 +3,7 @@
 // Body: { patient_id, doctor_id, message }
 
 require_once __DIR__ . '/../../lib/database.php';
+require_once __DIR__ . '/../../lib/jwt.php';
 require_once __DIR__ . '/../../lib/utils.php';
 
 corsHeaders();
